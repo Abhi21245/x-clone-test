@@ -1,13 +1,11 @@
 // import { promises } from "nodemailer/lib/xoauth2/index.js";
 import { Tweet } from "../models/tweet.model.js";
-import fs from "fs";
+
 import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { error } from "console";
-import { User } from "../models/user.model.js";
-import ApiError from "../utils/ApiError.js";
+
 import mongoose, { Model } from "mongoose";
-import { lookup } from "dns";
+
 
 // const tweet = await Tweet.findById(someId).populate('author');
 

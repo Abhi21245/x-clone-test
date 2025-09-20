@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { User } from "./user.model.js";
-import { arrayBuffer } from "stream/consumers";
+
+
 
 const tweetSchema = new Schema({
     parentTweetId: {
