@@ -1,4 +1,6 @@
 // import cookieParser from "cookie-parser";
+import { OAuth2Client } from "google-auth-library";
+import { clients } from "../app.js";
 import { User } from "../models/user.model.js";
 import otpStore from "../otpStore.js";
 import ApiError from "../utils/ApiError.js";
@@ -6,6 +8,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 // import {semnd}
 import sendCodeAndCheck from "../utils/otpCheck.js";
+import { providers } from "web3";
+import ApiResponse from "../utils/ApiResponse.js";
 // cookieParser
 
 const checkUserEmail = asyncHandler(async (req, res) => {
@@ -36,12 +40,57 @@ const checkUserEmail = asyncHandler(async (req, res) => {
 	});
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+	const {
+		username: userName,
+		name: fullName,
+		bio,
+		email,
+		location,
+		website,
+	} = req.body;
+
+	const { avatar, banner } = req.files;
+
+	const newDataToUpdate = {
+		userName,
+		fullName,
+		bio,
+		email,
+		location,
+		website,
+	};
+
+	if (avatar?.length > 0) {
+		console.log("inside avatar lentgh ");
+		const cloudinaryAvatarResponse = await uploadOnCloudinary(avatar[0]?.path);
+		newDataToUpdate.avatarUrl = cloudinaryAvatarResponse.url;
+	}
+	if (banner?.length > 0) {
+		console.log("inside banner lentgh ");
+		const cloudinaryBannerResponse = await uploadOnCloudinary(banner[0]?.path);
+		newDataToUpdate.bannerUrl = cloudinaryBannerResponse.url;
+	}
+
+	const result = await User.findByIdAndUpdate(
+		req.user._id,
+		{ $set: newDataToUpdate },
+		{
+			new: true,
+		}
+	);
+	return res.json({
+		message: "Profile update successfully",
+		updatedData: result,
+	});
+});
+
 const checkUserName = asyncHandler(async (req, res) => {
 	const userName = req.body.userName;
 
 	const result = await User.findOne({ userName });
 
-	if (result) {
+	if (result?.userName == userName) {
 		return res.status(400).json({
 			message: "Username is already taken",
 		});
@@ -55,14 +104,14 @@ const checkUserName = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
 	// console.log(req.body)
 	// console.log(req.files.avatar[0].path)
-	console.log("This is req.body", req.body);
+	// console.log("This is req.body", req.body);
 
-	const { userName,fullName, password, email, bio, year, month, day } = req.body;
+	const { userName, fullName, password, email, bio, year, month, day } =
+		req.body;
+
+	// console.log("This is reqbody from register function ",req.body)
 
 	const dateOfBirth = new Date(year, month - 1, day);
-
-	console.log("This is date of birth", dateOfBirth);
-	console.log("This is This is uername", userName);
 
 	if (!userName || !password || !email) {
 		const error = new Error("All fields are required");
@@ -79,8 +128,6 @@ const registerUser = asyncHandler(async (req, res) => {
 		],
 	});
 
-	// console.log("this is user",result);
-
 	if (result) {
 		const error = new Error();
 		error.message = "User already exist";
@@ -89,27 +136,19 @@ const registerUser = asyncHandler(async (req, res) => {
 	}
 
 	const avatarPath = req.files.avatar[0].path;
-	// const bannerPath = req.files.banner[0].path
 
 	const avatarUrl = await uploadOnCloudinary(avatarPath);
-	// const bannerUrl = await uploadOnCloudinary(bannerPath)
-
-	// console.log(data)
 
 	const user = await User.create({
 		userName,
 		password,
 		email,
 		fullName,
-		// fullName,
 		dob: dateOfBirth,
 		avatarUrl: avatarUrl.url,
-		// bannerUrl: bannerUrl.url,
 
 		bio,
 	});
-
-	console.log("This is user", user);
 
 	return res.json({
 		statuCode: 201,
@@ -141,10 +180,7 @@ const loginUser = asyncHandler(async (req, res) => {
 		error.statusCode = 401;
 		throw error;
 	}
-	// let userData = user
-	// delete userData.password
-	// delete userData.updatedAt
-	// // userData.delete = updatedAt
+
 	let userData = user.toObject();
 	delete userData.password;
 	delete userData.updatedAt;
@@ -167,8 +203,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 	const options = {
 		httpOnly: true,
-		secure: true,
-		sameSite: 'none'
+		secure: false,
 	};
 	// console.log("THis is new refreshtoken ",refreshToken)
 
@@ -220,7 +255,9 @@ const checkUserExist = asyncHandler(async (req, res) => {
 });
 
 const checkUserPassword = asyncHandler(async (req, res) => {
+	// console.log("this is rq.body",req.body)
 	const { password, emailorUsername } = req.body;
+
 	// console.log("This is req.body", req.body);
 	// console.log("This is email", emailorUsername)
 	// console.log("This is hello form checkpass")
@@ -267,14 +304,12 @@ const checkUserPassword = asyncHandler(async (req, res) => {
 		.status(200)
 		.cookie("accessToken", accessToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: 'none',
+			secure: false,
 			maxAge: 24 * 60 * 60 * 1000,
 		})
 		.cookie("refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: 'none',
+			secure: false,
 			maxAge: 10 * 24 * 60 * 60 * 1000,
 		})
 		.json({
@@ -363,30 +398,67 @@ const generateOtp = asyncHandler(async (req, res) => {
 	});
 });
 
-const searchForUser = asyncHandler(async(req,res)=>{
-	const searchQuery = req.params.query
+const searchForUser = asyncHandler(async (req, res) => {
+	const searchQuery = req.params.query;
 	// console.log("thi is searchQuery",searchQuery)
-	
+
 	if (!searchQuery) {
-		throw new ApiError(400,"Search query is empty")
+		throw new ApiError(400, "Search query is empty");
 	}
-	
-	const searchRegex = new RegExp(searchQuery,'i')
-	
+
+	const searchRegex = new RegExp(searchQuery, "i");
+
 	// console.log("thi is searchregex",searchRegex)
 
-
 	const results = await User.find({
-		userName:{$regex:searchQuery}
-	}).select("-refreshToken -password -email -updatedAt -__v ")
+		userName: { $regex: searchQuery },
+	}).select("-refreshToken -password -email -updatedAt -__v ");
 
-	return res.status(200).json({
-		message:"ok",
-		results
-	})
+	if (results.length > 0) {
+		return res.status(200).json({
+			success: true,
 
+			message: "User found with this username",
+			results,
+		});
+	} else {
+		return res.status(404).json({
+			success: false,
+			message: "No user found with this username",
+			results,
+		});
+	}
 
-})
+	// return res.status(200).json({
+	// 	message: "ok",
+	// 	results,
+	// });
+});
+
+const googleLogin = asyncHandler(async (req, res) => {
+	const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+	const { token } = req.body;
+
+	console.log("THis is token ", token);
+
+	const ticket = await client.verifyIdToken({
+		idToken: token,
+		audience: process.env.GOOGLE_CLIENT_ID,
+	});
+
+	const payload = ticket.getPayload();
+	const { email, name, picture } = payload;
+
+	let user = await User.findOne({ email });
+
+	if (!user) {
+		user = await User.create({
+			email,
+			userName: name,
+		});
+	}
+});
 
 export {
 	registerUser,
@@ -398,5 +470,7 @@ export {
 	checkUserName,
 	checkUserExist,
 	checkUserPassword,
-	searchForUser
+	searchForUser,
+	googleLogin,
+	updateProfile,
 };
