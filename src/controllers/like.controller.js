@@ -5,7 +5,6 @@ import { Tweet } from "../models/tweet.model.js";
 import { LikeModel } from "../models/like.model.js";
 import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
-// import session from "express-session";
 
 const like = asyncHandler(async (req, res) => {
 	const mongosession = await mongoose.startSession();

@@ -16,10 +16,8 @@ const verifyJwt = async (req, res, next) => {
         // console.log("i run successfully auth middleware")
         const accessToken = req.cookies.accessToken
 
-
-
-        console.log("This is a  ccesstoken ",accessToken)
-        console.log("This is a  ccesstoken ",req.cookies)
+        // console.log("This is a  ccesstoken ",accessToken)
+        // console.log("This is a  ccesstoken ",req.cookies)
         
         if (!accessToken) {
             const error = new Error("Unauthorized request: No token provided")

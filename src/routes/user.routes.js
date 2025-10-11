@@ -11,6 +11,7 @@ import {
 	otpCheck,
 	registerUser,
 	searchForUser,
+	searchForUserWithUserId,
 	updateProfile,
 } from "../controllers/user.controller.js";
 import upload from "../middlewares/multer.middleware.js";
@@ -18,8 +19,10 @@ import verifyJwt from "../middlewares/auth.middleware.js";
 import {
 	createTweet,
 	deleteTweet,
+	editTweet,
 	getfeedTweet,
 	getPostComments,
+	getPostWithId,
 	getUserTweet,
 } from "../controllers/tweet.controller.js";
 import {
@@ -59,16 +62,20 @@ router.route("/update-profile").post(
 	upload.fields([
 		{ name: "avatar", maxCount: 1 },
 		{ name: "banner", maxCount: 1 },
-	]), verifyJwt,updateProfile
+	]),
+	verifyJwt,
+	updateProfile
 );
 
-	
 router.route("/logout").post(logoutUser);
 
 router.route("/check-otp").post(otpCheck);
 router.route("/generate-otp").post(generateOtp);
 
 router.route("/find-user/:query").get(searchForUser);
+
+// router.route("/find-user-withid/:query").get(searchForUserWithUserId);
+router.route("/find-post-withid/:query").get(verifyJwt,getPostWithId);
 
 router.route("/create-post").post(
 	upload.fields([
@@ -78,8 +85,16 @@ router.route("/create-post").post(
 	createTweet
 );
 
+router.route("/edit-post").patch(
+	upload.fields([
+		{ name: "image", maxCount: 4 },
+		{ name: "video", maxCount: 1 },
+	]),
+	editTweet
+);
+
 router.route("/get-latest-tweets").get(verifyJwt, getfeedTweet);
-router.route("/delete-tweet").post(deleteTweet);
+router.route("/delete-tweet").delete(deleteTweet);
 
 router.route("/follow-user").post(verifyJwt, followUser);
 router.route("/unfollow-user").post(verifyJwt, unFollowUser);
