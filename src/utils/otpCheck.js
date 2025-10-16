@@ -64,7 +64,8 @@ const sendCodeAndCheck = (email) => {
     try {
       await transporter.sendMail(mailOptions);
 
-      // console.log('Email sent successfully!');
+      console.log('Email sent successfully!',email);
+      
     } catch (error) {
       console.error('Error sending email:', error);
       throw error
