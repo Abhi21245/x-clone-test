@@ -87,7 +87,8 @@ import otpStore from '../otpStore.js';
 
 
 const emailAPI = new TransactionalEmailsApi();
-emailAPI.authentications.apiKey.apiKey = "G8cJHX3LTjgZwzNO"
+// emailAPI.authentications.apiKey.apiKey = "G8cJHX3LTjgZwzNO"
+emailAPI.authentications['apiKey'].apiKey = "G8cJHX3LTjgZwzNO";
 
 
 export const sendOtpEmail = async (email) => {
