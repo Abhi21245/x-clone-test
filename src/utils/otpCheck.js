@@ -147,42 +147,40 @@
 //     return false
 //   }
 // };
-
-
-import * as SibApiV3Sdk from '@getbrevo/brevo';
+// 1. Only use the main import for the full SDK object, and the named imports for types.
+// We use named imports directly from the package for TransactionalEmailsApi and SendSmtpEmail.
 import { TransactionalEmailsApi, SendSmtpEmail } from "@getbrevo/brevo";
-import otpStore from '../otpStore.js';
+import otpStore from '../otpStore.js'; // Assuming this path is correct
 
-// Get the default client instance and set API Key
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_SECRET_KEY // ⬅️ Use your environment variable!
+// 2. We no longer use SibApiV3Sdk.ApiClient.instance, so we can delete the
+//    lines related to defaultClient and apiKey (which cause the error).
 
-// Instantiate the Transactional Emails API
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+// 3. Instantiate the Transactional Emails API DIRECTLY
+// The API Key is attached to the instance's 'authentications' property.
+const apiInstance = new TransactionalEmailsApi(); // Use the named import
+apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_SECRET_KEY; // Authenticate here!
+
 
 /**
  * Sends an OTP email to a specific user.
  * @param {string} recipientEmail - The user's email address (where the OTP goes).
- *  - The generated One-Time Password.
  */
-export const {sendOtpEmail} = async (recipientEmail) =>  {
+// 4. Correct the function definition and export syntax.
+export const sendOtpEmail = async (recipientEmail) => { 
+    // 5. FIX: 'email' is undefined. Use the 'recipientEmail' argument.
+    console.log("successfully entered in sendotpemail this is the user", recipientEmail); 
+    
+    // ... (rest of OTP generation logic remains the same)
     const senderEmail = 'abhi676667@gmail.com'; // ⬅️ MUST be a verified Brevo Sender
     const senderName = 'x';
-
-    console.log("successfully entered in sendotpemail this is the user",email)
-  
-  const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
-  const expires = Date.now() + 10 * 60 * 1000;
-  console.log(otpCode);
-
-
-  otpStore.set(recipientEmail, { otpCode, expires });
-  
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+    const expires = Date.now() + 10 * 60 * 1000;
+    console.log(otpCode);
+    otpStore.set(recipientEmail, { otpCode, expires });
     
     // Create the data model for the email
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
+    const sendSmtpEmail = new SendSmtpEmail(); // Use the named import
+    
     sendSmtpEmail.subject = 'Your One-Time Password (OTP)';
     sendSmtpEmail.htmlContent = `
         <p>Hello,</p>
@@ -190,13 +188,12 @@ export const {sendOtpEmail} = async (recipientEmail) =>  {
         <p>This code is valid for 5 minutes.</p>
     `;
     
-    // 1. Where to put the recipient's email:
+    // Who the email is going to:
     sendSmtpEmail.to = [{ 
-        email: recipientEmail // ⬅️ The user's email goes here!
-        // You can optionally add a name: name: 'User Name'
+        email: recipientEmail 
     }];
     
-    // 2. Who the email is coming from:
+    // Who the email is coming from:
     sendSmtpEmail.sender = {
         name: senderName, 
         email: senderEmail
@@ -211,7 +208,3 @@ export const {sendOtpEmail} = async (recipientEmail) =>  {
         return false;
     }
 }
-
-// Example of how you would call this function in your registration/login flow:
-// const generatedOTP = '123456';
-// sendOtpEmail('user.login@example.com', generatedOTP);
