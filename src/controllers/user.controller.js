@@ -7,7 +7,7 @@ import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 // import {semnd}
-import  {sendOtpEmail}  from "../utils/otpCheck.js";
+import  sendOtpEmail  from "../utils/otpCheck.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 // import { use } from "react";

@@ -164,7 +164,7 @@ const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 /**
  * Sends an OTP email to a specific user.
  * @param {string} recipientEmail - The user's email address (where the OTP goes).
- * @param {string} otpCode - The generated One-Time Password.
+ *  - The generated One-Time Password.
  */
 async function sendOtpEmail(recipientEmail) {
     const senderEmail = 'abhi676667@gmail.com'; // ⬅️ MUST be a verified Brevo Sender
@@ -177,7 +177,7 @@ async function sendOtpEmail(recipientEmail) {
   console.log(otpCode);
 
 
-  otpStore.set(email, { otpCode, expires });
+  otpStore.set(recipientEmail, { otpCode, expires });
   
     
     // Create the data model for the email
