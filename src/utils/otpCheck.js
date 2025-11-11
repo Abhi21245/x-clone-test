@@ -204,7 +204,7 @@ export const sendOtpEmail = async (recipientEmail) => {
         console.log('OTP Email sent successfully. Message ID:', data.messageId);
         return true;
     } catch (error) {
-        console.error('Error sending OTP email:', error.response ? error.response.body : error.message);
+        console.error('Error sending OTP email:', error);
         return false;
     }
 }
