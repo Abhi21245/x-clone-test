@@ -149,14 +149,14 @@
 // };
 
 
-import * as SibApiV3Sdk from 'sib-api-v3-sdk';
+import * as SibApiV3Sdk from '@getbrevo/brevo';
 import { TransactionalEmailsApi, SendSmtpEmail } from "@getbrevo/brevo";
 import otpStore from '../otpStore.js';
 
 // Get the default client instance and set API Key
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = "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" // ⬅️ Use your environment variable!
+apiKey.apiKey = process.env.BREVO_SECRET_KEY // ⬅️ Use your environment variable!
 
 // Instantiate the Transactional Emails API
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
