@@ -1,13 +1,13 @@
 // import cookieParser from "cookie-parser";
 import { OAuth2Client } from "google-auth-library";
-import { clients } from "../app.js";
+// import { clients } from "../app.js";
 import { User } from "../models/user.model.js";
 import otpStore from "../otpStore.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 // import {semnd}
-import sendCodeAndCheck from "../utils/otpCheck.js";
+import  sendOtpEmail  from "../utils/otpCheck.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 // import { use } from "react";
@@ -488,7 +488,7 @@ const generateOtp = asyncHandler(async (req, res) => {
 		throw error;
 	}
 
-	sendCodeAndCheck(email);
+	sendOtpEmail(email);
 
 	return res.json({
 		message: "The otp generate successfully",
