@@ -183,9 +183,25 @@ export const sendOtpEmail = async (recipientEmail) => {
     
     sendSmtpEmail.subject = 'Your One-Time Password (OTP)';
     sendSmtpEmail.htmlContent = `
-        <p>Hello,</p>
-        <p>Your One-Time Password is: <strong>${otpCode}</strong></p>
-        <p>This code is valid for 5 minutes.</p>
+         <div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; color: #333; background-color: #f7f7f7; padding: 20px;">
+//       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        
+//         <h1 style="font-size: 24px; font-weight: bold; color: #222; margin-top: 0;">Confirm your email address</h1>
+        
+//         <p>There’s one quick step you need to complete before creating your account. Please enter this verification code to get started:</p>
+        
+//         <div style="font-size: 36px; font-weight: bold; letter-spacing: 4px; text-align: center; margin: 30px 0; padding: 15px; background-color: #f0f0f0; border-radius: 5px;">
+//           ${otpCode}
+//         </div>
+        
+//         <p style="font-size: 14px; color: #555;">Verification codes expire after two hours.</p>
+        
+//         <p style="margin-top: 30px;">Thanks,<br>The X Team</p>
+
+//         <p style="font-size: 10px; color: #373737;">This is not an official X Team email. This is meant for testing purposes.</p>
+        
+//       </div>
+//     </div>
     `;
     
     // Who the email is going to:
