@@ -295,7 +295,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 	const options = {
 		httpOnly: true,
-		secure: false,
+		secure: true,
 		sameSite: 'none'
 	};
 	// console.log("THis is new refreshtoken ",refreshToken)
@@ -397,13 +397,13 @@ const checkUserPassword = asyncHandler(async (req, res) => {
 		.status(200)
 		.cookie("accessToken", accessToken, {
 			httpOnly: true,
-			secure: false,
+			secure: true,
 			sameSite: 'none',
 			maxAge: 24 * 60 * 60 * 1000,
 		})
 		.cookie("refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: false,
+			secure: true,
 			sameSite: 'none',
 			maxAge: 10 * 24 * 60 * 60 * 1000,
 		})
@@ -425,7 +425,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 	const options = {
 		httpOnly: true,
-		secure: false,
+		secure: true,
 		sameSite:"none",
 		// path: "/"
 	};
