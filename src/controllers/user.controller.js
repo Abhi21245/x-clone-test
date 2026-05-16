@@ -1,14 +1,12 @@
 // import cookieParser from "cookie-parser";
 import { OAuth2Client } from "google-auth-library";
-// import { clients } from "../app.js";
 import { User } from "../models/user.model.js";
 import otpStore from "../otpStore.js";
 import ApiError from "../utils/ApiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 // import {semnd}
-import  {sendOtpEmail}  from "../utils/otpCheck.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import sendCodeAndCheck from "../utils/otpCheck.js";
 import { Tweet } from "../models/tweet.model.js";
 // import { use } from "react";
 // cookieParser
@@ -297,8 +295,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
 	const options = {
 		httpOnly: true,
-		secure: true,
-		sameSite: "none",
+		secure: false,
+		sameSite: 'none'
 	};
 	// console.log("THis is new refreshtoken ",refreshToken)
 
@@ -399,14 +397,14 @@ const checkUserPassword = asyncHandler(async (req, res) => {
 		.status(200)
 		.cookie("accessToken", accessToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: "none",
+			secure: false,
+			sameSite: 'none',
 			maxAge: 24 * 60 * 60 * 1000,
 		})
 		.cookie("refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: "none",
+			secure: false,
+			sameSite: 'none',
 			maxAge: 10 * 24 * 60 * 60 * 1000,
 		})
 		.json({
@@ -428,7 +426,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 	const options = {
 		httpOnly: true,
 		secure: false,
-		// sameSite:"none",
+		sameSite:"none",
 		// path: "/"
 	};
 
@@ -488,7 +486,7 @@ const generateOtp = asyncHandler(async (req, res) => {
 		throw error;
 	}
 
-	sendOtpEmail(email);
+	sendCodeAndCheck(email);
 
 	return res.json({
 		message: "The otp generate successfully",
